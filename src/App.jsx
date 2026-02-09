@@ -15,23 +15,23 @@ const WIN_LINES = [
 function getWinner(board) {
   for (const [a, b, c] of WIN_LINES) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
+      return { winner: board[a], line: [a, b, c] };
     }
   }
-  return null;
+  return { winner: null, line: [] };
 }
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [player, setPlayer] = useState("X");
-  const winner = getWinner(board);
+  const { winner, line: winningLine } = getWinner(board);
   const isDraw = !winner && board.every((cell) => cell);
 
   const status = winner
-    ? `Winner: ${winner}`
+    ? `PLAYER ${winner} WINS`
     : isDraw
-      ? "Draw game"
-      : `Next player: ${player}`;
+      ? "DRAW"
+      : `${player}'S MOVE`;
 
   const handleCellClick = (index) => {
     if (board[index] || winner) return;
@@ -48,14 +48,17 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className="title">Tic Tac Toe</h1>
+      <h1 className="title">TIC TAC TOE</h1>
+      <span className="divider" aria-hidden="true" />
       <p className="status">{status}</p>
       <div className="grid" role="grid" aria-label="Tic Tac Toe">
         {board.map((cell, index) => (
           <button
             key={index}
             type="button"
-            className="cell"
+            className={`cell${cell ? ` ${cell.toLowerCase()}` : ""}${
+              winningLine.includes(index) ? " win" : ""
+            }`}
             onClick={() => handleCellClick(index)}
             disabled={Boolean(cell) || Boolean(winner)}
             aria-label={`Cell ${index + 1}`}
